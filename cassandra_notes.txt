@@ -1,0 +1,80 @@
+copy emp(deptno,id,deptname,name) from '/home/srinivasa/cassandra_emp.csv';
+
+CREATE TABLE videos_by_title_year (
+title text,
+added_year int,
+added_date timestamp,
+description text,
+user_id uuid,
+video_id uuid,
+PRIMARY KEY((title,added_year)));
+
+COPY videos_by_title_year FROM '/home/srinivasa/DS220/labwork/exercise-3/videos_by_title_year.csv' WITH HEADER=true;
+
+SELECT * FROM videos_by_title_year WHERE title = 'Introduction To Apache Cassandra' AND added_year = 2014;
+
+CREATE TABLE videos_by_tag_year (
+tag text,
+added_year int,
+video_id timeuuid,
+added_date timestamp,
+description text,
+title text,
+user_id uuid,
+PRIMARY KEY((tag),added_year, video_id));
+
+COPY videos_by_tag_year(tag, added_year, video_id, added_date, description, title, user_id) FROM '/home/srinivasa/DS220/labwork/exercise-4/videos_by_tag_year.csv' WITH HEADER=true;
+
+SELECT COUNT(*) FROM videos_by_tag_year;
+SELECT * FROM videos_by_tag_year WHERE tag = 'trailer' AND added_year = 2015 ;
+maxtra p - syrup : ml
+
+ex-5
+ALTER TABLE videos ADD tags set<text>;
+TRUNCATE videos;
+COPY videos FROM '/home/srinivasa/DS220/labwork/exercise-5/5videos.csv' WITH HEADER=true;
+CREATE TYPE video_encoding (
+encoding text,
+height int,
+width int,
+bit_rates set<text>);
+ALTER TABLE videos ADD encoding frozen<video_encoding> ;
+
+ex-6
+CREATE TABLE videos_count_by_tag (
+tag text,
+added_year int,
+video_count counter,
+PRIMARY KEY ((tag),added_year));
+
+SOURCE '/home/srinivasa/DS220/labwork/exercise-6/videos_count_by_tag.cql';
+SELECT tag, added_year, video_count FROM videos_count_by_tag;
+UPDATE videos_count_by_tag SET video_count = video_count + 1 WHERE tag = 'data modeling' AND added_year = 2011;
+
+ex-7
+CREATE TABLE videos_by_actor (
+  actor text,
+  added_date timestamp,
+  video_id timeuuid,
+  character_name text,
+  description text,
+  encoding frozen<video_encoding>,
+  tags set<text>,
+  title text,
+  user_id uuid,
+  PRIMARY KEY ((actor),added_date,video_id )
+) WITH CLUSTERING ORDER BY (added_date DESC);
+
+CREATE TABLE videos_by_genre (
+  genre text,
+  added_date timestamp,
+  video_id timeuuid,
+  description text,
+  encoding frozen<video_encoding1>,
+  tags set<text>,
+  title text,
+  user_id uuid,
+  PRIMARY KEY ((genre), added_date, video_id )
+) WITH CLUSTERING ORDER BY (added_date DESC);
+
+
